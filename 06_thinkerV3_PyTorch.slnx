@@ -1,0 +1,7 @@
+<Solution>
+  <Configurations>
+    <Platform Name="x64" />
+    <Platform Name="x86" />
+  </Configurations>
+  <Project Path="06_thinkerV3_PyTorch/06_thinkerV3_PyTorch.vcxproj" Id="e0d10143-126b-403b-954d-2b3065e4264d" />
+</Solution>
