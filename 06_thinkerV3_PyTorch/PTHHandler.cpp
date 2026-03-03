@@ -48,9 +48,15 @@ int load_model(Model* model, RunningMode _runningMode) {
         break;
 
     case RunningMode::RUNNINGMODE_GPU:
-        device = torch::Device(torch::kCUDA);
-        model_name = "best_gpu.pt";
-        error_code = -3;
+        if (torch::cuda::is_available()) {
+            device = torch::Device(torch::kCUDA);
+            model_name = "best_gpu.pt";
+            error_code = -3;
+        }
+        else {
+            std::cout << "[ERROR] GPU is not supported." << std::endl;
+            return -3;
+        }
         break;
 
     case RunningMode::RUNNINGMODE_AUTO:
@@ -78,8 +84,11 @@ int load_model(Model* model, RunningMode _runningMode) {
         // 構造体に格納
         model->module = std::make_shared<torch::jit::script::Module>(std::move(loaded_module));
 
-        std::cout << "[SUCCESS] モデルロード完了: " << model_path
+        std::cout << "[SUCCESS] Loading model finished: " << model_path
             << " (" << (device.is_cuda() ? "CUDA" : "CPU") << ")" << std::endl;
+
+        model->device = device;
+
         return 0;
 
     }
@@ -122,27 +131,39 @@ int predict(Model* model, State _state, float* _policies, float* _value)
     ).clone(); // データの所有権を確保
 
     try {
-        // 3. 推論実行
-        // モデルは2つの出力を返す想定: (policy, value)
-        auto outputs = model->module->forward({ input_tensor }).toTuple();
+        // 推論時のメモリ消費と計算コストを抑える
+        torch::NoGradGuard no_grad;
 
+        // 1. Model構造体に保存されているデバイスへ入力を転送
+        torch::Tensor device_input = input_tensor.to(model->device);
+
+        // 2. 推論実行
+        auto output_raw = model->module->forward({ device_input });
+
+        // 3. 出力を展開
+        auto outputs = output_raw.toTuple();
         torch::Tensor p_tensor = outputs->elements()[0].toTensor();
         torch::Tensor v_tensor = outputs->elements()[1].toTensor();
 
-        // 4. 結果の取り出し
-        // Policy (65次元)
-        auto p_data = p_tensor.accessor<float, 2>();
+        // 4. GPUからCPUへ戻して読み取り準備
+        auto p_tensor_cpu = p_tensor.to(torch::kCPU).to(torch::kFloat32);
+        auto v_tensor_cpu = v_tensor.to(torch::kCPU).to(torch::kFloat32);
+
+        // 5. Accessorで配列へ書き戻し
+        auto p_data = p_tensor_cpu.accessor<float, 2>();
         for (int i = 0; i < DN_OUTPUT_SIZE; i++) {
             _policies[i] = p_data[0][i];
         }
 
-        // Value (1次元)
-        auto v_data = v_tensor.accessor<float, 2>();
+        auto v_data = v_tensor_cpu.accessor<float, 2>();
         *_value = v_data[0][0];
-
     }
     catch (const c10::Error& e) {
-        std::cerr << "Inference error: " << e.msg() << std::endl;
+        std::cerr << "[ERROR] 推論中にLibTorchエラーが発生しました: " << e.msg() << std::endl;
+        return -1;
+    }
+    catch (const std::exception& e) {
+        std::cerr << "[ERROR] 標準例外が発生しました: " << e.what() << std::endl;
         return -1;
     }
 

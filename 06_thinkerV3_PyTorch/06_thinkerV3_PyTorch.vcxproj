@@ -112,7 +112,9 @@
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>..\..\libtorch-win-shared-with-deps-2.10.0+cu130\libtorch\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>ws2_32.lib;c10.lib;c10_cuda.lib;caffe2_nvrtc.lib;cpuinfo.lib;dnnl.lib;fmt.lib;kineto.lib;libittnotify.lib;libprotobuf-lite.lib;libprotobuf.lib;libprotoc.lib;microkernels-prod.lib;pthreadpool.lib;sleef.lib;torch.lib;torch_cpu.lib;torch_cuda.lib;XNNPACK.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>c10_cuda.lib;torch_cuda.lib;torch.lib;torch_cpu.lib;c10.lib;ws2_32.lib;caffe2_nvrtc.lib;cpuinfo.lib;dnnl.lib;fmt.lib;kineto.lib;libittnotify.lib;libprotobuf-lite.lib;libprotobuf.lib;libprotoc.lib;microkernels-prod.lib;pthreadpool.lib;sleef.lib;XNNPACK.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalOptions>/INCLUDE:?warp_size@cuda@at@@YAHXZ %(AdditionalOptions)</AdditionalOptions>
+      <OutputFile>$(OutDir)thinkerV3pt$(TargetExt)</OutputFile>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -131,7 +133,9 @@
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>..\..\libtorch-win-shared-with-deps-2.10.0+cu130\libtorch\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>ws2_32.lib;c10.lib;c10_cuda.lib;caffe2_nvrtc.lib;cpuinfo.lib;dnnl.lib;fmt.lib;kineto.lib;libittnotify.lib;libprotobuf-lite.lib;libprotobuf.lib;libprotoc.lib;microkernels-prod.lib;pthreadpool.lib;sleef.lib;torch.lib;torch_cpu.lib;torch_cuda.lib;XNNPACK.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>c10_cuda.lib;torch_cuda.lib;torch.lib;torch_cpu.lib;c10.lib;ws2_32.lib;caffe2_nvrtc.lib;cpuinfo.lib;dnnl.lib;fmt.lib;kineto.lib;libittnotify.lib;libprotobuf-lite.lib;libprotobuf.lib;libprotoc.lib;microkernels-prod.lib;pthreadpool.lib;sleef.lib;XNNPACK.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <OutputFile>$(OutDir)thinkerV3pt$(TargetExt)</OutputFile>
+      <AdditionalOptions>/INCLUDE:?warp_size@cuda@at@@YAHXZ %(AdditionalOptions)</AdditionalOptions>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>

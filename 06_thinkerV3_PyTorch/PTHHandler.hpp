@@ -14,7 +14,8 @@ enum class RunningMode {
 };
 
 typedef struct _Model {
-    std::shared_ptr<torch::jit::script::Module> module;
+	std::shared_ptr<torch::jit::script::Module> module;
+	torch::Device device = torch::kCPU; // ここに保存しておく
 } Model;
 
 int load_model(Model* model, RunningMode _runningMode);

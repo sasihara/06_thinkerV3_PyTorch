@@ -142,7 +142,6 @@ int Thinker::think(int turn, DISKCOLORS *board, int *place, GameId gameId)
 		// ŽŸ‚ÌŽè‚ð“¾‚é
 		Action action;
 		ret = next_action->run(state, &action, gameId);
-
 		if (ret < 0) return -6;
 
 		// Set the best place to "place"
