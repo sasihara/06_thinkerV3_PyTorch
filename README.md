@@ -13,10 +13,10 @@ Microsoft Visual Studio Community 2026での動作を確認しております。
 - 本ソースのコンパイルには、レポジトリ"01_othello"に含まれるソースも必要ですので、レポジトリ"01_othello"もダウンロードしておいて下さい。
 - プロジェクトファイルはthinkerV3_PyTorch.slnxです。Visual Studioでオープンしコンパイルすると、実行バイナリがx64\Releaseフォルダの下に作成されますので、それらをダブルクリックすることで実行できます。
 - コンパイルおよび本思考ルーチンの実行には、LibTorchで提供されるファイル一式が必要となります｡[PyTorchのページ](https://pytorch.org/)からダウンロードして下さい｡
-　- ページ中程のInstall PyTorchの所で､Your OSを"Windows"､Packageを"LibTorch"､Languageを"C++/Java"､Compute Platformを適切に選んでダウンロード･解凍してください｡コンパイルする場合は解凍したフォルダ一式を06_thinkerV3_PyTorchフォルダと同じフォルダに格納する必要があります｡
-　- 26/3/1現在のStable版(2.10.0)でコンパイル､CPU上で動作できることを確認しております｡
-　- バイナリを実行するには､環境変数pathにlibtorch\libフォルダを追加した後､マシンを再起動する必要があります｡
-- - (GPU上で動かす方法については現在調査中)
+  - ページ中程のInstall PyTorchの所で､Your OSを"Windows"､Packageを"LibTorch"､Languageを"C++/Java"､Compute Platformを適切に選んでダウンロード･解凍してください｡コンパイルする場合は解凍したフォルダ一式を06_thinkerV3_PyTorchフォルダと同じフォルダに格納する必要があります｡
+  - 26/3/1現在のStable版(2.10.0)でコンパイル､CPU上で動作できることを確認しております｡
+  - バイナリを実行するには､環境変数pathにlibtorch\libフォルダを追加した後､マシンを再起動する必要があります｡
+  - (GPU上で動かす方法については現在調査中)
 - thnkerV3.exeを実行すると、デフォルトではUDPポート番号60001でメッセージ待ち受け状態に入ります。"01_othello"プロジェクトに格納されるothello.exeを実行し、
 ボード上をクリックすることで表示されるゲームの初期設定画面において、"Computer(External)"にチェックを入れた後、黒もしくは白のHost Nameに"localhost"を、Portに"60001"をセットすることで、本思考ルーチンを用いてプレーすることができます。
 
