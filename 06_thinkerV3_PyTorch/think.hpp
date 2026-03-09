@@ -20,7 +20,7 @@ typedef struct _POLICY {
 
 class Thinker {
 public:
-	int init(RunningMode _runningMode, double _spTemperature, int _numIterations = PV_EVALUATE_COUNT, bool _isBreadthFirst = false);
+	int init(RunningMode _runningMode, double _spTemperature, int _numIterations = PV_EVALUATE_COUNT, bool _isBreadthFirst = false, bool _limitTemperaturePeriod = false);
 	int think(int turn, DISKCOLORS* board, int *place, GameId gameId);
 	char* getModelInfo();
 	~Thinker();
@@ -33,6 +33,7 @@ private:
 	int numIterations = PV_EVALUATE_COUNT;
 	bool isBreadthFirst = false;
 	RunningMode runningMode;
+	bool limitTemperaturePeriod = false;
 
 	int CountDisk(DISKCOLORS color, DISKCOLORS _board[64]);
 };

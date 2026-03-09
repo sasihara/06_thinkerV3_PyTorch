@@ -38,6 +38,7 @@ int main(int argc, char **argv)
     int messageLen;
     int ret;
     double spTemperature = SP_TEMPERATURE;
+    bool limitTemperaturePeriod = false;
     int numIterations = PV_EVALUATE_COUNT;
     bool isBreadthFirst = false;
     RunningMode runningMode = RunningMode::RUNNINGMODE_AUTO;
@@ -64,6 +65,12 @@ int main(int argc, char **argv)
                     case 't':
                         spTemperature = atof(&argv[i][2]);
                         if (spTemperature < 0.0) throw - 2;
+                        limitTemperaturePeriod = false;
+                        break;
+                    case 'T':
+                        spTemperature = atof(&argv[i][2]);
+                        if (spTemperature < 0.0) throw - 2;
+                        limitTemperaturePeriod = true;
                         break;
                     case 'i':
                         numIterations = atoi(&argv[i][2]);
@@ -106,6 +113,7 @@ int main(int argc, char **argv)
     logging.logout("spTemperature = %f", spTemperature);
     logging.logout("numIterations = %d", numIterations);
     logging.logout("isBreadthFirst = %s", isBreadthFirst ? "true" : "false");
+    logging.logout("limitTemperaturePeriod = %s", limitTemperaturePeriod ? "true" : "false");
     logging.logout("******************************");
 
     // 乱数の初期化
@@ -138,6 +146,7 @@ int main(int argc, char **argv)
     printf("Temperature = %f\n", spTemperature);
     printf("numIterations = %d\n", numIterations);
     printf("isBreadthFirst = %s\n", isBreadthFirst ? "true" : "false");
+    printf("limitTemperaturePeriod = %s\n", limitTemperaturePeriod ? "true" : "false");
     printf("Waiting requests at port = %d...\n\n", port);
 
     // Receive and handle messages until QUIT message is received

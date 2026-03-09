@@ -19,7 +19,7 @@
 extern History history;
 extern Logging logging;
 
-int Thinker::init(RunningMode _runningMode, double _spTemperature, int _numIterations, bool _isBreadthFirst)
+int Thinker::init(RunningMode _runningMode, double _spTemperature, int _numIterations, bool _isBreadthFirst, bool _limitTemperaturePeriod)
 {
 	int ret;
 
@@ -48,6 +48,7 @@ int Thinker::init(RunningMode _runningMode, double _spTemperature, int _numItera
 	spTemperature = _spTemperature;
 	numIterations = _numIterations;
 	isBreadthFirst = _isBreadthFirst;
+	limitTemperaturePeriod = _limitTemperaturePeriod;
 
 	// リターン
 	isInitialized = true;
@@ -81,6 +82,11 @@ int Thinker::think(int turn, DISKCOLORS *board, int *place, GameId gameId)
 	int numSpaceLeft;
 	numSpaceLeft = CountDisk(DISKCOLORS::COLOR_NONE, board);
 	LOGOUT(LOGLEVEL_TRACE, "残り石数 = %d.", numSpaceLeft);
+
+	// Temperature値の修正
+	if (limitTemperaturePeriod == true && numSpaceLeft <= 50) {
+		spTemperature = 0.0;
+	}
 
 	if (numSpaceLeft <= NUM_FOR_GAMESTATE_END) {
 		// thinkerV1(=完全読みモード)で思考

@@ -50,7 +50,7 @@ int load_model(Model* model, RunningMode _runningMode) {
     case RunningMode::RUNNINGMODE_GPU:
         if (torch::cuda::is_available()) {
             device = torch::Device(torch::kCUDA);
-            model_name = "best_gpu.pt";
+            model_name = "best_cuda.pt";
             error_code = -3;
         }
         else {
@@ -63,7 +63,7 @@ int load_model(Model* model, RunningMode _runningMode) {
     default:
         if (torch::cuda::is_available()) {
             device = torch::Device(torch::kCUDA);
-            model_name = "best_gpu.pt";
+            model_name = "best_cuda.pt";
         }
         else {
             device = torch::Device(torch::kCPU);
