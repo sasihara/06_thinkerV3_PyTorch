@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include <torch/script.h>
 #include <torch/torch.h>
 #include <memory>
@@ -18,6 +18,6 @@ typedef struct _Model {
 	torch::Device device = torch::kCPU; // ここに保存しておく
 } Model;
 
-int load_model(Model* model, RunningMode _runningMode);
+int load_model(Model* model, RunningMode _runningMode, int gpuid = -1);
 int free_model(Model* model);
 int predict(Model* model, State _state, float* _policies, float* _value);

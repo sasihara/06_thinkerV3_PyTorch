@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include "externalThinkerMessages.hpp"
 #include "main.hpp"
 //#include "TFHandler.hpp"
@@ -20,7 +20,7 @@ typedef struct _POLICY {
 
 class Thinker {
 public:
-	int init(RunningMode _runningMode, double _spTemperature, int _numIterations = PV_EVALUATE_COUNT, bool _isBreadthFirst = false, bool _limitTemperaturePeriod = false);
+	int init(RunningMode _runningMode, double _spTemperature, int _numIterations = PV_EVALUATE_COUNT, bool _isBreadthFirst = false, bool _limitTemperaturePeriod = false, int _gpuid = -1, bool _forceGPU = true);
 	int think(int turn, DISKCOLORS* board, int *place, GameId gameId);
 	char* getModelInfo();
 	~Thinker();
@@ -34,6 +34,7 @@ private:
 	bool isBreadthFirst = false;
 	RunningMode runningMode;
 	bool limitTemperaturePeriod = false;
+	int gpuid = -1;		// -1: not specify, 0-: gpuid
 
 	int CountDisk(DISKCOLORS color, DISKCOLORS _board[64]);
 };

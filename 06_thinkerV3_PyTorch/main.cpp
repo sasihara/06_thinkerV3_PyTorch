@@ -42,6 +42,8 @@ int main(int argc, char **argv)
     int numIterations = PV_EVALUATE_COUNT;
     bool isBreadthFirst = false;
     RunningMode runningMode = RunningMode::RUNNINGMODE_AUTO;
+    int gpuid = -1;
+    bool forceGPU = true;
 
     // Logging
 #ifdef _DEBUG
@@ -83,6 +85,19 @@ int main(int argc, char **argv)
                         break;
                     case 'G':
                         runningMode = RunningMode::RUNNINGMODE_GPU;
+                        if ('0' <= argv[i][2] && argv[i][2] <= '9') {
+                            gpuid = atoi(&argv[i][2]);
+                            if (gpuid < 0) throw - 5;
+                        }
+                        forceGPU = true;
+                        break;
+                    case 'g':
+                        runningMode = RunningMode::RUNNINGMODE_GPU;
+                        if ('0' <= argv[i][2] && argv[i][2] <= '9') {
+                            gpuid = atoi(&argv[i][2]);
+                            if (gpuid < 0) throw - 5;
+                        }
+                        forceGPU = false;
                         break;
                     case 'C':
                         runningMode = RunningMode::RUNNINGMODE_CPU;
@@ -97,16 +112,28 @@ int main(int argc, char **argv)
     }
     catch(int ret){
         printf("\n\nUsage: thinkerV3.exe [options]\n\n");
-        printf(" options:\n\n");
+        printf(" options([]:mandatory parameter, ():Optional Parameter)\n\n");
         printf("  -p[port number]: Port number to listen. ""port number"" must be larger than or equal to 1024.\n");
         printf("  -t[temperature]: Temperature (>= 0.0).\n");
         printf("  -b             : Breadth First search.\n");
         printf("  -C             : Force to use CPU.\n");
-        printf("  -G             : Force to use GPU.\n");
+        printf("  -G(GPU)        : Force to use GPU of GPUID=(GPU).\n");
+        printf("  -g(GPU)        : Try to use GPU of GPUID=(GPU). If impossible, use CPU.\n");
         printf("\n\n");
 
         return ret;
     }
+
+    printf("\n");
+    printf("%s\n", TEXTINFO);
+    printf("Model = %s\n", thinker.getModelInfo());
+    printf("Temperature = %f\n", spTemperature);
+    printf("numIterations = %d\n", numIterations);
+    printf("isBreadthFirst = %s\n", isBreadthFirst ? "true" : "false");
+    printf("limitTemperaturePeriod = %s\n", limitTemperaturePeriod ? "true" : "false");
+    gpuid < 0 ? printf("gpuid = (Not specify)\n") : printf("gpuid = %d\n", gpuid);
+    printf("Force to use specified GPU = %s\n", forceGPU ? "true" : "false");
+    printf("\n");
 
     logging.logout("***** Command Paramters ******");
     logging.logout("Port Number = %d", port);
@@ -114,13 +141,15 @@ int main(int argc, char **argv)
     logging.logout("numIterations = %d", numIterations);
     logging.logout("isBreadthFirst = %s", isBreadthFirst ? "true" : "false");
     logging.logout("limitTemperaturePeriod = %s", limitTemperaturePeriod ? "true" : "false");
+    logging.logout("specified gpuid= %d", gpuid);
+    logging.logout("Force to use specified GPU = %s", forceGPU ? "true" : "false");
     logging.logout("******************************");
 
     // 乱数の初期化
     srand((unsigned)time(0));
 
     // Thinkerの初期化
-    ret = thinker.init(runningMode, spTemperature, numIterations, isBreadthFirst);
+    ret = thinker.init(runningMode, spTemperature, numIterations, isBreadthFirst, limitTemperaturePeriod, gpuid, forceGPU);
     if (ret < 0) {
         return -4;
     }
@@ -140,14 +169,7 @@ int main(int argc, char **argv)
     bind(sock, (struct sockaddr*) & addr, sizeof(addr));
 
     // Start to wait receiving requests
-    printf("\n");
-    printf("%s\n", TEXTINFO);
-    printf("Model = %s\n", thinker.getModelInfo());
-    printf("Temperature = %f\n", spTemperature);
-    printf("numIterations = %d\n", numIterations);
-    printf("isBreadthFirst = %s\n", isBreadthFirst ? "true" : "false");
-    printf("limitTemperaturePeriod = %s\n", limitTemperaturePeriod ? "true" : "false");
-    printf("Waiting requests at port = %d...\n\n", port);
+    printf("\nWaiting requests at port = %d...\n\n", port);
 
     // Receive and handle messages until QUIT message is received
     for (;;) {
