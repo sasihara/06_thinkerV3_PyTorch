@@ -64,12 +64,12 @@ int main(int argc, char **argv)
                             throw - 1;
                         }
                         break;
-                    case 't':
+                    case 'T':
                         spTemperature = atof(&argv[i][2]);
                         if (spTemperature < 0.0) throw - 2;
                         limitTemperaturePeriod = false;
                         break;
-                    case 'T':
+                    case 't':
                         spTemperature = atof(&argv[i][2]);
                         if (spTemperature < 0.0) throw - 2;
                         limitTemperaturePeriod = true;
