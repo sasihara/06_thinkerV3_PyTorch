@@ -25,8 +25,8 @@ Microsoft Visual Studio Community 2026での動作を確認しております。
 
 |オプション|意味|
 |-|-|
-|-t[temperature]|Temperature(>= 0.0)|
-|-T[temperature]|序盤(最初の10手)のみTemperature(>= 0.0)を適用する｡|
+|-T[temperature]|Temperature(>= 0.0)|
+|-t[temperature]|序盤(最初の10手)のみTemperature(>= 0.0)を適用する｡|
 |-b|モンテカルロ法で探索する際に､横優先で探索する｡|
 |-C|CPUを使って推論する｡|
 |-G(gpuid)|GPUを使って推論する｡-Gの後にGPU番号を指定してGPUを特定するのも可能｡使用できない場合はエラーコードを出力して終了する｡|
