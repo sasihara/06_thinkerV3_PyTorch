@@ -10,6 +10,12 @@
 //#define SP_TEMPERATURE 4.0
 #define PV_EVALUATE_COUNT 100
 
+enum class THINKARC{
+	THINKARC_DEEP = 0,
+	THINKARC_MINMAX,
+	THINKARC_MINMAX_MP
+};
+
 typedef int Action;
 
 typedef struct _POLICY {
@@ -18,9 +24,20 @@ typedef struct _POLICY {
 	float policy;
 } Policy;
 
+typedef struct _ThinkerInitParam {
+	RunningMode runningMode;
+	double spTemperature;
+	int numIterations = PV_EVALUATE_COUNT;
+	bool isBreadthFirst = false;
+	bool limitTemperaturePeriod = false;
+	int gpuid = -1;
+	bool forceGPU = true;
+	THINKARC thinkArc = THINKARC::THINKARC_DEEP;
+} ThinkerInitParam;
+
 class Thinker {
 public:
-	int init(RunningMode _runningMode, double _spTemperature, int _numIterations = PV_EVALUATE_COUNT, bool _isBreadthFirst = false, bool _limitTemperaturePeriod = false, int _gpuid = -1, bool _forceGPU = true);
+	int init(ThinkerInitParam *thinkerInitParam);
 	int think(int turn, DISKCOLORS* board, int *place, GameId gameId);
 	char* getModelInfo();
 	~Thinker();
@@ -35,6 +52,7 @@ private:
 	RunningMode runningMode;
 	bool limitTemperaturePeriod = false;
 	int gpuid = -1;		// -1: not specify, 0-: gpuid
+	THINKARC thinkArc;
 
 	int CountDisk(DISKCOLORS color, DISKCOLORS _board[64]);
 };

@@ -19,20 +19,20 @@
 extern History history;
 extern Logging logging;
 
-int Thinker::init(RunningMode _runningMode, double _spTemperature, int _numIterations, bool _isBreadthFirst, bool _limitTemperaturePeriod, int _gpuid, bool _forceGPU)
+int Thinker::init(ThinkerInitParam *thinkerInitParam)
 {
 	int ret;
 
 	// RunningModeのセット
-	runningMode = _runningMode;
-	gpuid = _gpuid;
+	runningMode = thinkerInitParam->runningMode;
+	gpuid = thinkerInitParam->gpuid;
 
 	// メイン部分相当をここに実装
 	// モデルのロード
 	ret = load_model(&model, runningMode, gpuid);
 
 	if (ret < 0) {
-		if (_forceGPU == false && runningMode == RunningMode::RUNNINGMODE_GPU) {
+		if (thinkerInitParam->forceGPU == false && runningMode == RunningMode::RUNNINGMODE_GPU) {
 			ret = load_model(&model, RunningMode::RUNNINGMODE_CPU);
 
 			if (ret < 0) return -1;
@@ -53,10 +53,11 @@ int Thinker::init(RunningMode _runningMode, double _spTemperature, int _numItera
 	}
 
 	// 温度パラメータ､繰り返し回数､探索方法をセット
-	spTemperature = _spTemperature;
-	numIterations = _numIterations;
-	isBreadthFirst = _isBreadthFirst;
-	limitTemperaturePeriod = _limitTemperaturePeriod;
+	spTemperature = thinkerInitParam->spTemperature;
+	numIterations = thinkerInitParam->numIterations;
+	isBreadthFirst = thinkerInitParam->isBreadthFirst;
+	limitTemperaturePeriod = thinkerInitParam->limitTemperaturePeriod;
+	thinkArc = thinkerInitParam->thinkArc;
 
 	// リターン
 	isInitialized = true;
@@ -96,10 +97,10 @@ int Thinker::think(int turn, DISKCOLORS *board, int *place, GameId gameId)
 		spTemperature = 0.0;
 	}
 
-	if (numSpaceLeft <= NUM_FOR_GAMESTATE_END) {
+	if (thinkArc == THINKARC::THINKARC_MINMAX || thinkArc == THINKARC::THINKARC_MINMAX_MP || numSpaceLeft <= NUM_FOR_GAMESTATE_END) {
 		// thinkerV1(=完全読みモード)で思考
 		// thinkerV1の初期化
-		ret = thinkerV1.SetParams(turn, board);
+		ret = thinkerV1.SetParams(turn, board, thinkArc);
 		if (ret < 0) return -1;
 
 		ret = thinkerV1.think();

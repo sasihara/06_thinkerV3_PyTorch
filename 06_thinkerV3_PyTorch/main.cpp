@@ -44,6 +44,7 @@ int main(int argc, char **argv)
     RunningMode runningMode = RunningMode::RUNNINGMODE_AUTO;
     int gpuid = -1;
     bool forceGPU = true;
+    THINKARC thinkArc = THINKARC::THINKARC_DEEP;
 
     // Logging
 #ifdef _DEBUG
@@ -102,6 +103,14 @@ int main(int argc, char **argv)
                     case 'C':
                         runningMode = RunningMode::RUNNINGMODE_CPU;
                         break;
+                    case 'M':
+                        if (argv[i][2] == 'P') {
+                            thinkArc = THINKARC::THINKARC_MINMAX;
+                        }
+                        else {
+                            thinkArc = THINKARC::THINKARC_MINMAX_MP;
+                        }
+                        break;
                     }
                 }
                 else {
@@ -149,7 +158,16 @@ int main(int argc, char **argv)
     srand((unsigned)time(0));
 
     // Thinkerの初期化
-    ret = thinker.init(runningMode, spTemperature, numIterations, isBreadthFirst, limitTemperaturePeriod, gpuid, forceGPU);
+    ThinkerInitParam thinkerInitParam;
+    thinkerInitParam.runningMode = runningMode;
+    thinkerInitParam.spTemperature = spTemperature;
+    thinkerInitParam.numIterations = numIterations;
+    thinkerInitParam.isBreadthFirst = isBreadthFirst;
+    thinkerInitParam.limitTemperaturePeriod = limitTemperaturePeriod;
+    thinkerInitParam.gpuid = gpuid;
+    thinkerInitParam.forceGPU = forceGPU;
+
+    ret = thinker.init(&thinkerInitParam);
     if (ret < 0) {
         return -4;
     }

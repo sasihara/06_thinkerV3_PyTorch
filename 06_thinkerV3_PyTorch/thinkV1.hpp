@@ -1,6 +1,7 @@
-#pragma once
+﻿#pragma once
 #include "othello.hpp"
 #include "logging.h"
+#include "think.hpp"
 
 // Bit for disk character
 #define DISKCHARFLAG_EXISTENCE	0x01		// Indicates disk exsits or not
@@ -23,7 +24,7 @@ enum class GAMESTATE {
 
 class ThinkerV1 {
 public:
-	int SetParams(int turn, DISKCOLORS board[64]);
+	int SetParams(int turn, DISKCOLORS board[64], THINKARC _thinkArc);
 	int think();
 	void analyzeDiskCharacter(DISKCOLORS board[64], int result[64]);
 
@@ -32,6 +33,8 @@ private:
 	int turn;
 	GAMESTATE thinkerState = GAMESTATE::GAMESTATE_EARLY_STAGE;
 	DISKCOLORS currentPlayer, opponent;
+	THINKARC thinkArc;
+	int numThreads = 8;
 	int CheckPosX[60] = {
 		0, 0, 7, 7,
 		2, 2, 3, 4, 5, 5, 3, 4,
@@ -83,6 +86,7 @@ private:
 	
 	int CountDisk(DISKCOLORS color, DISKCOLORS _board[64]);
 	int findBestPlaceForCurrentPlayer(int lv);
+	int findBestPlaceForCurrentPlayerMP(int lv);
 	int MaxLevel(int lv, bool f, int beta, DISKCOLORS _board[64]);
 	int MinLevel(int lv, bool f, int alpha, DISKCOLORS _board[64]);
 	int evcal(DISKCOLORS _board[64]);
