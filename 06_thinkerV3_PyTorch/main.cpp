@@ -176,6 +176,7 @@ int main(int argc, char **argv)
     thinkerInitParam.limitTemperaturePeriod = limitTemperaturePeriod;
     thinkerInitParam.gpuid = gpuid;
     thinkerInitParam.forceGPU = forceGPU;
+    thinkerInitParam.thinkArc = thinkArc;
     thinkerInitParam.numThreads = numThreads;
 
     ret = thinker.init(&thinkerInitParam);
@@ -336,7 +337,7 @@ void HandleThinkRequest(MessageParser messageParser, SOCKET sock, struct sockadd
     // Send Think Accept message
     ret = SendThinkAccept(id, sock, from, sockaddr_in_size);
 
-    printf("Think Accept sent. ID = %d. Thinking...\n", id);
+    printf("Think Accept sent. ID = %d. ", id);
 
     // Think
     int place;

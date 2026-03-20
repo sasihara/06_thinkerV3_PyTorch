@@ -155,6 +155,8 @@ int Thinker::think(int turn, DISKCOLORS *board, int *place, GameId gameId)
 			return -5;
 		}
 
+		printf("Thinking(Deep Learning)...\n");
+
 		// 次の手を得る
 		Action action;
 		ret = next_action->run(state, &action, gameId);

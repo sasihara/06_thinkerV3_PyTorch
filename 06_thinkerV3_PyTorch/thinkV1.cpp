@@ -106,32 +106,50 @@ int ThinkerV1::think()
 	numSpaceLeft = CountDisk(DISKCOLORS::COLOR_NONE, board);
 	LOGOUT(LOGLEVEL_TRACE, "残り石数 = %d.", numSpaceLeft);
 
-	if (numSpaceLeft <= NUM_FOR_GAMESTATE_END) {
-		depth = INT_MAX;
-		thinkerState = GAMESTATE::GAMESTATE_END;
-		LOGOUT(LOGLEVEL_TRACE, "完全読みモードへ移ります.");
-	}
-	else if (numSpaceLeft <= NUM_FOR_GAMESTATE_MIDFIELD) {
-		depth = SEARCH_DEPTH;
-		thinkerState = GAMESTATE::GAMESTATE_MIDFIELD;
-		LOGOUT(LOGLEVEL_TRACE, "中盤モードで進めます.");
-	}
-	else {
-		depth = SEARCH_DEPTH;
-		thinkerState = GAMESTATE::GAMESTATE_EARLY_STAGE;
-		LOGOUT(LOGLEVEL_TRACE, "序盤モードで進めます.");
-	}
-
 	// Player detection
 	currentPlayer = CURRENTPLAYER(turn);
 	opponent = OPPONENT(currentPlayer);
 
 	// Start to think.
-	if (thinkArc == THINKARC::THINKARC_MINMAX) {
-		ret = findBestPlaceForCurrentPlayer(depth);
+	if (thinkArc == THINKARC::THINKARC_MINMAX_MP) {
+		if (numSpaceLeft <= NUM_FOR_GAMESTATE_END_MP) {
+			depth = INT_MAX;
+			thinkerState = GAMESTATE::GAMESTATE_END;
+			LOGOUT(LOGLEVEL_TRACE, "完全読みモードへ移ります.");
+		}
+		else if (numSpaceLeft <= NUM_FOR_GAMESTATE_MIDFIELD) {
+			depth = SEARCH_DEPTH_MP;
+			thinkerState = GAMESTATE::GAMESTATE_MIDFIELD;
+			LOGOUT(LOGLEVEL_TRACE, "中盤モードで進めます.");
+		}
+		else {
+			depth = SEARCH_DEPTH_MP;
+			thinkerState = GAMESTATE::GAMESTATE_EARLY_STAGE;
+			LOGOUT(LOGLEVEL_TRACE, "序盤モードで進めます.");
+		}
+
+		printf("Thinking(Min-Max MP, %dthreads)...\n", numThreads);
+		ret = findBestPlaceForCurrentPlayerMP(depth);
 	}
 	else {
-		ret = findBestPlaceForCurrentPlayerMP(depth);
+		if (numSpaceLeft <= NUM_FOR_GAMESTATE_END) {
+			depth = INT_MAX;
+			thinkerState = GAMESTATE::GAMESTATE_END;
+			LOGOUT(LOGLEVEL_TRACE, "完全読みモードへ移ります.");
+		}
+		else if (numSpaceLeft <= NUM_FOR_GAMESTATE_MIDFIELD) {
+			depth = SEARCH_DEPTH;
+			thinkerState = GAMESTATE::GAMESTATE_MIDFIELD;
+			LOGOUT(LOGLEVEL_TRACE, "中盤モードで進めます.");
+		}
+		else {
+			depth = SEARCH_DEPTH;
+			thinkerState = GAMESTATE::GAMESTATE_EARLY_STAGE;
+			LOGOUT(LOGLEVEL_TRACE, "序盤モードで進めます.");
+		}
+
+		printf("Thinking(Min-Max)...\n");
+		ret = findBestPlaceForCurrentPlayer(depth);
 	}
 
 	LOGOUT(LOGLEVEL_TRACE, "★==================== think() end. ====================★");

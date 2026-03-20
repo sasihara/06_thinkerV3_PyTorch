@@ -8,6 +8,8 @@
 #define DISKCHARFLAG_CHANGABLE	0x02		// Indicates disk can be changed or not
 
 // Parameters for thinker
+#define SEARCH_DEPTH_MP				7
+#define NUM_FOR_GAMESTATE_END_MP	14
 #define SEARCH_DEPTH				6
 #define NUM_FOR_GAMESTATE_END		12
 //#define SEARCH_DEPTH				7
