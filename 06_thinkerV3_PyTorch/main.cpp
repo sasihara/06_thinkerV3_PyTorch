@@ -45,6 +45,7 @@ int main(int argc, char **argv)
     int gpuid = -1;
     bool forceGPU = true;
     THINKARC thinkArc = THINKARC::THINKARC_DEEP;
+    int numThreads = 4;
 
     // Logging
 #ifdef _DEBUG
@@ -105,10 +106,13 @@ int main(int argc, char **argv)
                         break;
                     case 'M':
                         if (argv[i][2] == 'P') {
-                            thinkArc = THINKARC::THINKARC_MINMAX;
+                            thinkArc = THINKARC::THINKARC_MINMAX_MP;
+                            numThreads = atoi(&argv[i][3]);
+
+                            if (numThreads == 0) numThreads = 4;    // Set default
                         }
                         else {
-                            thinkArc = THINKARC::THINKARC_MINMAX_MP;
+                            thinkArc = THINKARC::THINKARC_MINMAX;
                         }
                         break;
                     }
@@ -122,12 +126,14 @@ int main(int argc, char **argv)
     catch(int ret){
         printf("\n\nUsage: thinkerV3.exe [options]\n\n");
         printf(" options([]:mandatory parameter, ():Optional Parameter)\n\n");
-        printf("  -p[port number]: Port number to listen. ""port number"" must be larger than or equal to 1024.\n");
-        printf("  -t[temperature]: Temperature (>= 0.0).\n");
-        printf("  -b             : Breadth First search.\n");
-        printf("  -C             : Force to use CPU.\n");
-        printf("  -G(GPU)        : Force to use GPU of GPUID=(GPU).\n");
-        printf("  -g(GPU)        : Try to use GPU of GPUID=(GPU). If impossible, use CPU.\n");
+        printf("  -p[port number]        : Port number to listen. ""port number"" must be larger than or equal to 1024.\n");
+        printf("  -t[temperature]        : Temperature (>= 0.0).\n");
+        printf("  -b                     : Breadth First search.\n");
+        printf("  -C                     : Force to use CPU.\n");
+        printf("  -G(GPU)                : Force to use GPU of GPUID=(GPU).\n");
+        printf("  -g(GPU)                : Try to use GPU of GPUID=(GPU). If impossible, use CPU.\n");
+        printf("  -M                     : Use Min-Max based thinker.\n");
+        printf("  -MP(Number of threads) : Use Min-Max based with OpenMP thinker.\n");
         printf("\n\n");
 
         return ret;
@@ -142,6 +148,8 @@ int main(int argc, char **argv)
     printf("limitTemperaturePeriod = %s\n", limitTemperaturePeriod ? "true" : "false");
     gpuid < 0 ? printf("gpuid = (Not specify)\n") : printf("gpuid = %d\n", gpuid);
     printf("Force to use specified GPU = %s\n", forceGPU ? "true" : "false");
+    printf("Thinker Architecture = %s\n", thinkArc == THINKARC::THINKARC_DEEP ? "Deep Learning based" : thinkArc == THINKARC::THINKARC_MINMAX ? "Min-Max Based" : "Min-Max Based(Multi Processor)");
+    if(thinkArc == THINKARC::THINKARC_MINMAX_MP) printf("Number of threads = %d\n", numThreads);
     printf("\n");
 
     logging.logout("***** Command Paramters ******");
@@ -152,6 +160,8 @@ int main(int argc, char **argv)
     logging.logout("limitTemperaturePeriod = %s", limitTemperaturePeriod ? "true" : "false");
     logging.logout("specified gpuid= %d", gpuid);
     logging.logout("Force to use specified GPU = %s", forceGPU ? "true" : "false");
+    logging.logout("Thinker Architecture = %s", thinkArc == THINKARC::THINKARC_DEEP ? "Deep Learning based" : thinkArc == THINKARC::THINKARC_MINMAX ? "Min-Max Based" : "Min-Max Based(Multi Processor)");
+    if (thinkArc == THINKARC::THINKARC_MINMAX_MP) logging.logout("Number of threads = %d", numThreads);
     logging.logout("******************************");
 
     // 乱数の初期化
@@ -166,6 +176,7 @@ int main(int argc, char **argv)
     thinkerInitParam.limitTemperaturePeriod = limitTemperaturePeriod;
     thinkerInitParam.gpuid = gpuid;
     thinkerInitParam.forceGPU = forceGPU;
+    thinkerInitParam.numThreads = numThreads;
 
     ret = thinker.init(&thinkerInitParam);
     if (ret < 0) {

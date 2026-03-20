@@ -24,7 +24,7 @@ enum class GAMESTATE {
 
 class ThinkerV1 {
 public:
-	int SetParams(int turn, DISKCOLORS board[64], THINKARC _thinkArc);
+	int SetParams(int turn, DISKCOLORS board[64], THINKARC _thinkArc, int _numThreads);
 	int think();
 	void analyzeDiskCharacter(DISKCOLORS board[64], int result[64]);
 
@@ -34,7 +34,7 @@ private:
 	GAMESTATE thinkerState = GAMESTATE::GAMESTATE_EARLY_STAGE;
 	DISKCOLORS currentPlayer, opponent;
 	THINKARC thinkArc;
-	int numThreads = 8;
+	int numThreads = 4;
 	int CheckPosX[60] = {
 		0, 0, 7, 7,
 		2, 2, 3, 4, 5, 5, 3, 4,

@@ -2,12 +2,13 @@
 // Copyright (C) 1994  T.Sashihara
 // This program goes with Othello for Windows Ver 3.00
 
-//#include <omp.h>
+#include <omp.h>
 #include <stdio.h>
 #include <memory.h>
 #include <limits.h>
 #include "externalThinkerMessages.hpp"
 #include "thinkV1.hpp"
+#include <atomic>
 
 extern Logging logging;
 
@@ -68,11 +69,12 @@ static const int patternsToFix[] = {
 //	Return:
 //		0: Succeed
 //
-int ThinkerV1::SetParams(int _turn, DISKCOLORS _board[64], THINKARC _thinkArc)
+int ThinkerV1::SetParams(int _turn, DISKCOLORS _board[64], THINKARC _thinkArc, int _numThreads)
 {
 	memcpy(board, _board, sizeof(board));
 	turn = _turn;
 	thinkArc = _thinkArc;
+	numThreads = _numThreads;
 	return 0;
 }
 
@@ -125,12 +127,12 @@ int ThinkerV1::think()
 	opponent = OPPONENT(currentPlayer);
 
 	// Start to think.
-	//if (thinkArc == THINKARC::THINKARC_MINMAX) {
+	if (thinkArc == THINKARC::THINKARC_MINMAX) {
 		ret = findBestPlaceForCurrentPlayer(depth);
-	//}
-	//else {
-		//ret = findBestPlaceForCurrentPlayerMP(depth);
-	//}
+	}
+	else {
+		ret = findBestPlaceForCurrentPlayerMP(depth);
+	}
 
 	LOGOUT(LOGLEVEL_TRACE, "★==================== think() end. ====================★");
 	return ret;
@@ -190,53 +192,53 @@ int ThinkerV1::findBestPlaceForCurrentPlayer(int lv)
 	return x * 10 + y;
 }
 
-//int ThinkerV1::findBestPlaceForCurrentPlayerMP(int lv)
-//{
-//	int i;
-//	int eval = INT_MIN; // 全スレッドで共有する「現在の最大スコア」
-//	int bestX = -1, bestY = -1;
-//
-//	// 使用するコア数を設定
-//	if (this->numThreads > 0) {
-//		omp_set_num_threads(this->numThreads);
-//	}
-//
-//	// reduction(max:eval): 各スレッドが計算した localScore の中から最大値を eval に集約
-//	// ただし、座標(bestX, bestY)も同時に更新する必要があるため、
-//	// ここでは敢えて reduction を使わず critical セクションで一貫性を保ちます。
-//#pragma omp parallel for schedule(dynamic)
-//	for (i = 0; i < 60; i++) {
-//		int localFlag;
-//		int currentEval;
-//		DISKCOLORS tmpBoard[64];
-//
-//		// 各ループ実行時点での「暫定最大スコア」を取得（枝切り効率のため）
-//#pragma omp atomic read
-//		currentEval = eval;
-//
-//		if ((localFlag = check(board, CheckPosX[i], CheckPosY[i], currentPlayer)) > 0) {
-//			memcpy(tmpBoard, board, sizeof(tmpBoard));
-//			turnDisk(tmpBoard, CheckPosX[i], CheckPosY[i], currentPlayer, localFlag);
-//
-//			// 探索実行: 第3引数にはその時点での最高評価値を渡す
-//			int score = MinLevel(lv - 1, false, currentEval, tmpBoard);
-//
-//			// スコアが暫定最大を超えた場合のみ、クリティカルセクションで安全に更新
-//			if (score > currentEval) {
-//#pragma omp critical(update_best)
-//				{
-//					if (score > eval) {
-//						eval = score;
-//						bestX = CheckPosX[i];
-//						bestY = CheckPosY[i];
-//					}
-//				}
-//			}
-//		}
-//	}
-//
-//	return bestX * 10 + bestY;
-//}
+int ThinkerV1::findBestPlaceForCurrentPlayerMP(int lv)
+{
+	int i;
+	std::atomic<int> evalAtomic{INT_MIN}; // 全スレッドで共有する「現在の最大スコア」
+	int bestX = -1, bestY = -1;
+
+	// 使用するコア数を設定
+	if (this->numThreads > 0) {
+		omp_set_num_threads(this->numThreads);
+	}
+
+	// reduction(max:eval): 各スレッドが計算した localScore の中から最大値を eval に集約
+	// ただし、座標(bestX, bestY)も同時に更新する必要があるため、
+	// ここでは敢えて reduction を使わず critical セクションで一貫性を保ちます。
+#pragma omp parallel for schedule(dynamic)
+	for (i = 0; i < 60; i++) {
+		int localFlag;
+		int currentEval;
+		DISKCOLORS tmpBoard[64];
+
+		// 各ループ実行時点での「暫定最大スコア」を取得（枝切り効率のため）
+		currentEval = evalAtomic.load(std::memory_order_relaxed);
+
+		if ((localFlag = check(board, CheckPosX[i], CheckPosY[i], currentPlayer)) > 0) {
+			memcpy(tmpBoard, board, sizeof(tmpBoard));
+			turnDisk(tmpBoard, CheckPosX[i], CheckPosY[i], currentPlayer, localFlag);
+
+			// 探索実行: 第3引数にはその時点での最高評価値を渡す
+			int score = MinLevel(lv - 1, false, currentEval, tmpBoard);
+
+			// スコアが暫定最大を超えた場合のみ、クリティカルセクションで安全に更新
+			if (score > currentEval) {
+#pragma omp critical(update_best)
+				{
+					int globalEval = evalAtomic.load(std::memory_order_relaxed);
+					if (score > globalEval) {
+						evalAtomic.store(score, std::memory_order_relaxed);
+						bestX = CheckPosX[i];
+						bestY = CheckPosY[i];
+					}
+				}
+			}
+		}
+	}
+
+	return bestX * 10 + bestY;
+}
 
 //
 //	Function Name: MaxLevel

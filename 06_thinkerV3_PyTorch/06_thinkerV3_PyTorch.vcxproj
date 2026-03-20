@@ -107,6 +107,7 @@
       <LanguageStandard>stdcpp20</LanguageStandard>
       <AdditionalIncludeDirectories>..\..\01_othello\othello;..\..\01_othello\common;..\..\libtorch-win-shared-with-deps-2.10.0+cu130\libtorch\include;..\..\libtorch-win-shared-with-deps-2.10.0+cu130\libtorch\include\torch;..\..\libtorch-win-shared-with-deps-2.10.0+cu130\libtorch\include\torch\csrc\api\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalOptions>/INCLUDE:?search_serializer@jit@torch@@YA?AV?$variant@U?$pair@V?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@V12@@std@@U?$pair@VPath@jit@torch@@V123@@2@@std@@AEBVPath@23@@Z %(AdditionalOptions)</AdditionalOptions>
+      <OpenMPSupport>true</OpenMPSupport>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -128,6 +129,7 @@
       <LanguageStandard>stdcpp20</LanguageStandard>
       <AdditionalIncludeDirectories>..\..\01_othello\othello;..\..\01_othello\common;..\..\libtorch-win-shared-with-deps-2.10.0+cu130\libtorch\include;..\..\libtorch-win-shared-with-deps-2.10.0+cu130\libtorch\include\torch;..\..\libtorch-win-shared-with-deps-2.10.0+cu130\libtorch\include\torch\csrc\api\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalOptions>/INCLUDE:?search_serializer@jit@torch@@YA?AV?$variant@U?$pair@V?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@V12@@std@@U?$pair@VPath@jit@torch@@V123@@2@@std@@AEBVPath@23@@Z %(AdditionalOptions)</AdditionalOptions>
+      <OpenMPSupport>true</OpenMPSupport>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>

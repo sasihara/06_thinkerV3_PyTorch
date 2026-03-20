@@ -33,6 +33,7 @@ typedef struct _ThinkerInitParam {
 	int gpuid = -1;
 	bool forceGPU = true;
 	THINKARC thinkArc = THINKARC::THINKARC_DEEP;
+	int numThreads = 4;
 } ThinkerInitParam;
 
 class Thinker {
@@ -53,6 +54,7 @@ private:
 	bool limitTemperaturePeriod = false;
 	int gpuid = -1;		// -1: not specify, 0-: gpuid
 	THINKARC thinkArc;
+	int numThreads = 4;
 
 	int CountDisk(DISKCOLORS color, DISKCOLORS _board[64]);
 };
