@@ -45,7 +45,8 @@ int main(int argc, char **argv)
     int gpuid = -1;
     bool forceGPU = true;
     THINKARC thinkArc = THINKARC::THINKARC_DEEP;
-    int numThreads = 4;
+    int numThreads = DEFAULT_NUM_THREADS;
+    int depth = DEFAULT_SEARCH_DEPTH;
 
     // Logging
 #ifdef _DEBUG
@@ -109,11 +110,20 @@ int main(int argc, char **argv)
                             thinkArc = THINKARC::THINKARC_MINMAX_MP;
                             numThreads = atoi(&argv[i][3]);
 
-                            if (numThreads == 0) numThreads = 4;    // Set default
+                            if (numThreads == 0) numThreads = DEFAULT_NUM_THREADS;    // Set default
                         }
                         else {
                             thinkArc = THINKARC::THINKARC_MINMAX;
                         }
+                        break;
+                    case 'd':
+                        depth = atoi(&argv[i][2]);
+                        if (depth <= 0) {
+                            depth = 6;
+                        }
+                        break;
+                    case 'h':
+                        throw - 6;
                         break;
                     }
                 }
@@ -134,6 +144,7 @@ int main(int argc, char **argv)
         printf("  -g(GPU)                : Try to use GPU of GPUID=(GPU). If impossible, use CPU.\n");
         printf("  -M                     : Use Min-Max based thinker.\n");
         printf("  -MP(Number of threads) : Use Min-Max based with OpenMP thinker.\n");
+        printf("  -d[depth]              : Search depth for Min-Max based thinker.\n");
         printf("\n\n");
 
         return ret;
@@ -150,6 +161,7 @@ int main(int argc, char **argv)
     printf("Force to use specified GPU = %s\n", forceGPU ? "true" : "false");
     printf("Thinker Architecture = %s\n", thinkArc == THINKARC::THINKARC_DEEP ? "Deep Learning based" : thinkArc == THINKARC::THINKARC_MINMAX ? "Min-Max Based" : "Min-Max Based(Multi Processor)");
     if(thinkArc == THINKARC::THINKARC_MINMAX_MP) printf("Number of threads = %d\n", numThreads);
+    if (thinkArc == THINKARC::THINKARC_MINMAX || thinkArc == THINKARC::THINKARC_MINMAX_MP) printf("Search Depth = %d\n", depth);
     printf("\n");
 
     logging.logout("***** Command Paramters ******");
@@ -162,6 +174,7 @@ int main(int argc, char **argv)
     logging.logout("Force to use specified GPU = %s", forceGPU ? "true" : "false");
     logging.logout("Thinker Architecture = %s", thinkArc == THINKARC::THINKARC_DEEP ? "Deep Learning based" : thinkArc == THINKARC::THINKARC_MINMAX ? "Min-Max Based" : "Min-Max Based(Multi Processor)");
     if (thinkArc == THINKARC::THINKARC_MINMAX_MP) logging.logout("Number of threads = %d", numThreads);
+    if (thinkArc == THINKARC::THINKARC_MINMAX || thinkArc == THINKARC::THINKARC_MINMAX_MP) logging.logout("Search Depth = %d", depth);
     logging.logout("******************************");
 
     // 乱数の初期化
@@ -178,6 +191,7 @@ int main(int argc, char **argv)
     thinkerInitParam.forceGPU = forceGPU;
     thinkerInitParam.thinkArc = thinkArc;
     thinkerInitParam.numThreads = numThreads;
+    thinkerInitParam.depth = depth;
 
     ret = thinker.init(&thinkerInitParam);
     if (ret < 0) {

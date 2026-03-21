@@ -59,6 +59,7 @@ int Thinker::init(ThinkerInitParam *thinkerInitParam)
 	limitTemperaturePeriod = thinkerInitParam->limitTemperaturePeriod;
 	thinkArc = thinkerInitParam->thinkArc;
 	numThreads = thinkerInitParam->numThreads;
+	depth = thinkerInitParam->depth;
 
 	// リターン
 	isInitialized = true;
@@ -101,7 +102,7 @@ int Thinker::think(int turn, DISKCOLORS *board, int *place, GameId gameId)
 	if (thinkArc == THINKARC::THINKARC_MINMAX || thinkArc == THINKARC::THINKARC_MINMAX_MP || numSpaceLeft <= NUM_FOR_GAMESTATE_END) {
 		// thinkerV1(=完全読みモード)で思考
 		// thinkerV1の初期化
-		ret = thinkerV1.SetParams(turn, board, thinkArc, numThreads);
+		ret = thinkerV1.SetParams(turn, board, thinkArc, numThreads, depth);
 		if (ret < 0) return -1;
 
 		ret = thinkerV1.think();

@@ -10,6 +10,9 @@
 //#define SP_TEMPERATURE 4.0
 #define PV_EVALUATE_COUNT 100
 
+#define	DEFAULT_NUM_THREADS		8
+#define DEFAULT_SEARCH_DEPTH	6
+
 enum class THINKARC{
 	THINKARC_DEEP = 0,
 	THINKARC_MINMAX,
@@ -33,7 +36,8 @@ typedef struct _ThinkerInitParam {
 	int gpuid = -1;
 	bool forceGPU = true;
 	THINKARC thinkArc = THINKARC::THINKARC_DEEP;
-	int numThreads = 4;
+	int numThreads = DEFAULT_NUM_THREADS;
+	int depth = DEFAULT_SEARCH_DEPTH;
 } ThinkerInitParam;
 
 class Thinker {
@@ -54,7 +58,8 @@ private:
 	bool limitTemperaturePeriod = false;
 	int gpuid = -1;		// -1: not specify, 0-: gpuid
 	THINKARC thinkArc;
-	int numThreads = 4;
+	int numThreads = 8;
+	int depth = 6;
 
 	int CountDisk(DISKCOLORS color, DISKCOLORS _board[64]);
 };

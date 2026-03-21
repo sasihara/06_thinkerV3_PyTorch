@@ -69,12 +69,13 @@ static const int patternsToFix[] = {
 //	Return:
 //		0: Succeed
 //
-int ThinkerV1::SetParams(int _turn, DISKCOLORS _board[64], THINKARC _thinkArc, int _numThreads)
+int ThinkerV1::SetParams(int _turn, DISKCOLORS _board[64], THINKARC _thinkArc, int _numThreads, int _depth)
 {
 	memcpy(board, _board, sizeof(board));
 	turn = _turn;
 	thinkArc = _thinkArc;
 	numThreads = _numThreads;
+	depth = _depth;
 	return 0;
 }
 
@@ -90,7 +91,7 @@ int ThinkerV1::SetParams(int _turn, DISKCOLORS _board[64], THINKARC _thinkArc, i
 //
 int ThinkerV1::think()
 {
-	int depth;
+	int depthToApply;
 	int ret;
 	int numSpaceLeft;
 
@@ -110,46 +111,30 @@ int ThinkerV1::think()
 	currentPlayer = CURRENTPLAYER(turn);
 	opponent = OPPONENT(currentPlayer);
 
-	// Start to think.
-	if (thinkArc == THINKARC::THINKARC_MINMAX_MP) {
-		if (numSpaceLeft <= NUM_FOR_GAMESTATE_END_MP) {
-			depth = INT_MAX;
-			thinkerState = GAMESTATE::GAMESTATE_END;
-			LOGOUT(LOGLEVEL_TRACE, "完全読みモードへ移ります.");
-		}
-		else if (numSpaceLeft <= NUM_FOR_GAMESTATE_MIDFIELD) {
-			depth = SEARCH_DEPTH_MP;
-			thinkerState = GAMESTATE::GAMESTATE_MIDFIELD;
-			LOGOUT(LOGLEVEL_TRACE, "中盤モードで進めます.");
-		}
-		else {
-			depth = SEARCH_DEPTH_MP;
-			thinkerState = GAMESTATE::GAMESTATE_EARLY_STAGE;
-			LOGOUT(LOGLEVEL_TRACE, "序盤モードで進めます.");
-		}
-
-		printf("Thinking(Min-Max MP, %dthreads)...\n", numThreads);
-		ret = findBestPlaceForCurrentPlayerMP(depth);
+	if (numSpaceLeft <= depth * 2) {
+		depthToApply = INT_MAX;
+		thinkerState = GAMESTATE::GAMESTATE_END;
+		LOGOUT(LOGLEVEL_TRACE, "完全読みモードへ移ります.");
+	}
+	else if (numSpaceLeft <= NUM_FOR_GAMESTATE_MIDFIELD) {
+		depthToApply = depth;
+		thinkerState = GAMESTATE::GAMESTATE_MIDFIELD;
+		LOGOUT(LOGLEVEL_TRACE, "中盤モードで進めます.");
 	}
 	else {
-		if (numSpaceLeft <= NUM_FOR_GAMESTATE_END) {
-			depth = INT_MAX;
-			thinkerState = GAMESTATE::GAMESTATE_END;
-			LOGOUT(LOGLEVEL_TRACE, "完全読みモードへ移ります.");
-		}
-		else if (numSpaceLeft <= NUM_FOR_GAMESTATE_MIDFIELD) {
-			depth = SEARCH_DEPTH;
-			thinkerState = GAMESTATE::GAMESTATE_MIDFIELD;
-			LOGOUT(LOGLEVEL_TRACE, "中盤モードで進めます.");
-		}
-		else {
-			depth = SEARCH_DEPTH;
-			thinkerState = GAMESTATE::GAMESTATE_EARLY_STAGE;
-			LOGOUT(LOGLEVEL_TRACE, "序盤モードで進めます.");
-		}
+		depthToApply = depth;
+		thinkerState = GAMESTATE::GAMESTATE_EARLY_STAGE;
+		LOGOUT(LOGLEVEL_TRACE, "序盤モードで進めます.");
+	}
 
+	// Start to think.
+	if (thinkArc == THINKARC::THINKARC_MINMAX_MP) {
+		printf("Thinking(Min-Max MP, %dthreads)...\n", numThreads);
+		ret = findBestPlaceForCurrentPlayerMP(depthToApply);
+	}
+	else {
 		printf("Thinking(Min-Max)...\n");
-		ret = findBestPlaceForCurrentPlayer(depth);
+		ret = findBestPlaceForCurrentPlayer(depthToApply);
 	}
 
 	LOGOUT(LOGLEVEL_TRACE, "★==================== think() end. ====================★");
