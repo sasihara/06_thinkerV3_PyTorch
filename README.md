@@ -24,7 +24,7 @@ Microsoft Visual Studio Community 2026での動作を確認しております。
 
 |オプション|意味|
 |-|-|
-|-p[port|ポート番号portで待ち受ける｡|
+|-p[port]|ポート番号portで要求を待ち受ける｡|
 |-T[temperature]|Temperature(>= 0.0)|
 |-t[temperature]|序盤(最初の10手)のみTemperature(>= 0.0)を適用し､残りはtemperature=0とする｡|
 |-b|モンテカルロ法で探索する際に､幅優先で探索する｡|
