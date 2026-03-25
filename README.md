@@ -18,16 +18,16 @@ Microsoft Visual Studio Community 2026での動作を確認しております。
   - ページ中程のInstall PyTorchの所で､Your OSを"Windows"､Packageを"LibTorch"､Languageを"C++/Java"､Compute Platformを適切に選んでダウンロード･解凍してください｡コンパイルする場合は解凍したフォルダ一式を06_thinkerV3_PyTorchフォルダと同じフォルダに格納する必要があります｡
   - 26/3/1現在のStable版(2.10.0)でコンパイル､CPU上で動作できることを確認しております｡
   - バイナリを実行するには､環境変数pathにlibtorch\libフォルダを追加した後､マシンを再起動する必要があります｡
-  - (GPU上で動かす方法については現在調査中)
 - thnkerV3.exeを実行すると、デフォルトではUDPポート番号60001でメッセージ待ち受け状態に入ります。"01_othello"プロジェクトに格納されるothello.exeを実行し、
 ボード上をクリックすることで表示されるゲームの初期設定画面において、"Computer(External)"にチェックを入れた後、黒もしくは白のHost Nameに"localhost"を、Portに"60001"をセットすることで、本思考ルーチンを用いてプレーすることができます。
 - 起動時のオプションは以下の通り｡
 
 |オプション|意味|
 |-|-|
+|-p[port|ポート番号portで待ち受ける｡|
 |-T[temperature]|Temperature(>= 0.0)|
-|-t[temperature]|序盤(最初の10手)のみTemperature(>= 0.0)を適用する｡|
-|-b|モンテカルロ法で探索する際に､横優先で探索する｡|
+|-t[temperature]|序盤(最初の10手)のみTemperature(>= 0.0)を適用し､残りはtemperature=0とする｡|
+|-b|モンテカルロ法で探索する際に､幅優先で探索する｡|
 |-C|CPUを使って推論する｡|
 |-G(gpuid)|GPUを使って推論する｡-Gの後にGPU番号を指定してGPUを特定するのも可能｡使用できない場合はエラーコードを出力して終了する｡|
 |-g(gpuid)|GPUを使って推論する｡-gの後にGPU番号を指定してGPUを特定するのも可能｡使用できない場合はCPU使用に切り替える｡|
