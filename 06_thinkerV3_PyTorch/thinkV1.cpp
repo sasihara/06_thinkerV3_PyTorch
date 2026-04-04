@@ -532,7 +532,7 @@ void ThinkerV1::analyzeDiskCharacter(DISKCOLORS board[64], int result[64])
 {
 	int i;
 
-	memset(result, 0, sizeof(result));
+	memset(result, 0, sizeof(int) * 64);
 
 	for (i = 0; i < 64; i++) {
 		if (board[i] != DISKCOLORS::COLOR_NONE) result[i] |= DISKCHARFLAG_EXISTENCE;

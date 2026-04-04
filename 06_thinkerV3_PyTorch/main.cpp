@@ -152,13 +152,22 @@ int main(int argc, char **argv)
 
     printf("\n");
     printf("%s\n", TEXTINFO);
-    printf("Model = %s\n", thinker.getModelInfo());
-    printf("Temperature = %f\n", spTemperature);
+    printf("Temperature = %f(%s)\n", spTemperature, limitTemperaturePeriod == true ? "Only the first 10 moves; the rest are 0.0": "all moves");
     printf("numIterations = %d\n", numIterations);
     printf("isBreadthFirst = %s\n", isBreadthFirst ? "true" : "false");
-    printf("limitTemperaturePeriod = %s\n", limitTemperaturePeriod ? "true" : "false");
-    gpuid < 0 ? printf("gpuid = (Not specify)\n") : printf("gpuid = %d\n", gpuid);
-    printf("Force to use specified GPU = %s\n", forceGPU ? "true" : "false");
+    switch (runningMode) {
+    case RunningMode::RUNNINGMODE_AUTO:
+        printf("Running Mode = AUTO\n");
+        break;
+    case RunningMode::RUNNINGMODE_CPU:
+        printf("Running Mode = CPU\n");
+        break;
+    case RunningMode::RUNNINGMODE_GPU:
+        printf("Running Mode = GPU\n");
+        gpuid < 0 ? printf("gpuid = (Not specify)\n") : printf("gpuid = %d\n", gpuid);
+        printf("Force to use specified GPU = %s\n", forceGPU ? "true" : "false");
+        break;
+    }
     printf("Thinker Architecture = %s\n", thinkArc == THINKARC::THINKARC_DEEP ? "Deep Learning based" : thinkArc == THINKARC::THINKARC_MINMAX ? "Min-Max Based" : "Min-Max Based(Multi Processor)");
     if(thinkArc == THINKARC::THINKARC_MINMAX_MP) printf("Number of threads = %d\n", numThreads);
     if (thinkArc == THINKARC::THINKARC_MINMAX || thinkArc == THINKARC::THINKARC_MINMAX_MP) printf("Search Depth = %d\n", depth);
@@ -166,12 +175,22 @@ int main(int argc, char **argv)
 
     logging.logout("***** Command Paramters ******");
     logging.logout("Port Number = %d", port);
-    logging.logout("spTemperature = %f", spTemperature);
+    logging.logout("Temperature = %f(%s)", spTemperature, limitTemperaturePeriod == true ? "Only the first 10 moves; the rest are 0.0" : "all moves");
     logging.logout("numIterations = %d", numIterations);
     logging.logout("isBreadthFirst = %s", isBreadthFirst ? "true" : "false");
-    logging.logout("limitTemperaturePeriod = %s", limitTemperaturePeriod ? "true" : "false");
-    logging.logout("specified gpuid= %d", gpuid);
-    logging.logout("Force to use specified GPU = %s", forceGPU ? "true" : "false");
+    switch (runningMode) {
+    case RunningMode::RUNNINGMODE_AUTO:
+        logging.logout("Running Mode = AUTO");
+        break;
+    case RunningMode::RUNNINGMODE_CPU:
+        logging.logout("Running Mode = CPU");
+        break;
+    case RunningMode::RUNNINGMODE_GPU:
+        logging.logout("Running Mode = GPU");
+        gpuid < 0 ? logging.logout("gpuid = (Not specify)") : logging.logout("gpuid = %d", gpuid);
+        logging.logout("Force to use specified GPU = %s", forceGPU ? "true" : "false");
+        break;
+    }
     logging.logout("Thinker Architecture = %s", thinkArc == THINKARC::THINKARC_DEEP ? "Deep Learning based" : thinkArc == THINKARC::THINKARC_MINMAX ? "Min-Max Based" : "Min-Max Based(Multi Processor)");
     if (thinkArc == THINKARC::THINKARC_MINMAX_MP) logging.logout("Number of threads = %d", numThreads);
     if (thinkArc == THINKARC::THINKARC_MINMAX || thinkArc == THINKARC::THINKARC_MINMAX_MP) logging.logout("Search Depth = %d", depth);
@@ -196,6 +215,10 @@ int main(int argc, char **argv)
     ret = thinker.init(&thinkerInitParam);
     if (ret < 0) {
         return -4;
+    }
+    else {
+        printf("Model = %s\n", thinker.getModelInfo());
+        logging.logout("Model = %s", thinker.getModelInfo());
     }
 
     // Historyの初期化
